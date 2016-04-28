@@ -682,17 +682,16 @@ void CheckFile(std::string fname) {
         if (acpriority && autocorrect.count(s) > 0) {
           if (debugcost)
             std::cout << CYN << s << " -> " << autocorrect[s] << ": AUTO" << BLN << "\n";
-          s = autocorrect[s];
             if (first) {
               if (toterminal)
-                std::cout << startpunc << s << endpunc;
-              fs << startpunc << s << endpunc;
+                std::cout << startpunc << RED << s << CYN << autocorrect[s] << BLN << endpunc;
+              fs << startpunc << autocorrect[s] << endpunc;
               first = false;
             }
             else {
               if (toterminal)
-                std::cout << DELIMITER << startpunc << s << endpunc;
-              fs << DELIMITER << startpunc << s << endpunc;
+                std::cout << DELIMITER << startpunc << RED << s << CYN << autocorrect[s] << BLN << endpunc;
+              fs << DELIMITER << startpunc << autocorrect[s] << endpunc;
             }
             start = str.find_first_not_of(DELIMITER, end);
             continue;
