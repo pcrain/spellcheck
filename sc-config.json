@@ -1,4 +1,6 @@
 {
+  "acfile":"dictionaries/wiki-ac.json",
+  "acpriority":true,
   // "dictfile":"dictionaries/gutendict-small.json",
   "dictfile":"dictionaries/wikidic-en.json",
   "dscale":2,
@@ -8,7 +10,7 @@
   "ldelta":3,
   "sscale":2,
   "sweight":2,
-  "wcthreshold":500
+  "wcthreshold":1
 }
 // 69.97% @ 10
 // 78.98% @ 100
@@ -17,5 +19,6 @@
 
 // 69.97% @ 10
 // 79.48% @ 100
+// 80.62% @ 300
 // 79.48% @ 500
 // 77.18% @ 1000

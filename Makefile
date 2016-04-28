@@ -3,3 +3,5 @@ all:
 
 clean:
 	rm -f spellcheck
+
+remake: clean all

@@ -95,6 +95,7 @@ const char DELIMITER = ' ';
 const std::regex word("[a-zA-Z']+(-[a-zA-Z']+)?");
 
 static std::map<std::string,int> wordcounts;
+static std::map<std::string,std::string> autocorrect;
 static stringlist firstletters[27][27][50];
 
 struct replacement{
@@ -110,6 +111,7 @@ bool training = false;
 bool debugcost = false;
 bool toterminal = false;
 bool continuous = false;
+bool acpriority = true;
 
 float delweight = 3;
 float delscale = 2;
@@ -124,9 +126,35 @@ int wcthreshold = 1;
 
 std::string dictfile = "/home/pretzel/workspace/spellcheck/alldicts";
 std::string trainfile = "/home/pretzel/data/gutenberg/allpaths";
+std::string acfile = "";
 
 bool FileExists(const std::string &Filename ) {
     return access( Filename.c_str(), 0 ) == 0;
+}
+
+void LoadAutoCorrect(std::string dpath) {
+  if (! FileExists(dpath)) {
+    std::cout << "Autocorrect dictionary " << dpath << " does not exist" << std::endl;
+    return;
+  }
+  // return;
+  std::ifstream input(dpath);
+  Json::Value root;
+  Json::Reader reader;
+  bool parsingSuccessful = reader.parse(input, root);
+  if (parsingSuccessful ) {
+    for(Json::ValueIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
+      // std::cout << itr.key() << ": " << *itr << "\n";
+      std::string s = itr.key().asString();
+      std::string r = (*itr).asString();
+      // std::cout << s << "->" << r << std::endl;
+      autocorrect[s] = r;
+    }
+    input.close();
+    return;
+  }
+  std::cout  << "Failed to parse configuration\n";
+  input.close();
 }
 
 void LoadDict(std::string dpath) {
@@ -184,6 +212,11 @@ void LoadConfig(std::string dpath) {
     for(Json::ValueIterator itr = root.begin() ; itr != root.end() ; itr++ ) {
       std::string s = itr.key().asString();
       // wordcounts[s] = (*itr).asInt();
+      if (s.compare("acfile") == 0) {
+        acfile = (*itr).asString();
+        // std::cout << "Using autocorrect dictionary " << acfile << std::endl;
+        continue;
+      }
       if (s.compare("dictfile") == 0) {
         dictfile = (*itr).asString();
         // std::cout << "Using dictionary " << dictfile << std::endl;
@@ -196,6 +229,11 @@ void LoadConfig(std::string dpath) {
       }
       if (s.compare("wcthreshold") == 0) {
         wcthreshold = (*itr).asInt();
+        // std::cout << "Using wcthreshold of " << std::to_string(wcthreshold) << std::endl;
+        continue;
+      }
+      if (s.compare("acpriority") == 0) {
+        acpriority = (*itr).asBool();
         // std::cout << "Using wcthreshold of " << std::to_string(wcthreshold) << std::endl;
         continue;
       }
@@ -218,6 +256,8 @@ int LevenPrint(std::string s, std::string t, int** d, bool keydist) {
   // std::cout << temp << std::endl;
   float inserts = insweight, subs = subweight, dels = delweight;
   while (i > 0 || j > 0) {
+    if (weight < -10000 || weight > 100)
+      return -10000;  //Cut it off before it gets out of hand
     int c = d[i][j];
     if (i > 0 && j > 0 && d[i-1][j-1] <= d[i-1][j] && d[i-1][j-1] <= d[i][j-1] && d[i-1][j-1] <= c) {
       i -= 1; j -= 1;
@@ -467,6 +507,15 @@ std::string FindReplacements(std::string s, std::fstream &fs) {
   for (int i = 0; i < MATCHES; ++i)
     reps[i] = {"",99};
 
+  //Check for autocorrect
+  if (! acpriority) {
+    if (autocorrect.count(s) > 0) {
+      if (debugcost)
+        std::cout << CYN << "  " << autocorrect[s] << ": AUTO" << BLN << "\n";
+      return autocorrect[s];
+    }
+  }
+
   //Check for single letter swap
   std::string bs = "";
   int bsc = 99;
@@ -630,6 +679,24 @@ void CheckFile(std::string fname) {
           caps = true;
           std::transform(s.begin(), s.end(), s.begin(), ::tolower);
         }
+        if (acpriority && autocorrect.count(s) > 0) {
+          if (debugcost)
+            std::cout << CYN << s << " -> " << autocorrect[s] << ": AUTO" << BLN << "\n";
+          s = autocorrect[s];
+            if (first) {
+              if (toterminal)
+                std::cout << startpunc << s << endpunc;
+              fs << startpunc << s << endpunc;
+              first = false;
+            }
+            else {
+              if (toterminal)
+                std::cout << DELIMITER << startpunc << s << endpunc;
+              fs << DELIMITER << startpunc << s << endpunc;
+            }
+            start = str.find_first_not_of(DELIMITER, end);
+            continue;
+        }
         if (wordcounts.count(s) == 0) {
           if (s.length() < 2) {
             //1 letter word
@@ -765,7 +832,7 @@ int ParseArgs(int argc, char** argv) {
         nthreads = std::atoi(optarg);
         std::cout << "Using " << std::to_string(nthreads) << " threads" << std::endl;
       case '?':  // unknown option...
-        std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
+        // std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
         break;
     }
   }
@@ -779,6 +846,9 @@ int main(int argc, char** argv) {
     ReadFileList(trainfile);
   } else if (continuous || optind < argc) {
     LoadDict(dictfile);
+    if (FileExists(acfile)) {
+      LoadAutoCorrect(acfile);
+    }
     if (continuous) {
       std::string file;
       while (true) {
