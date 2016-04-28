@@ -78,8 +78,7 @@ static keymap::value_type x[] = {
 static keymap KEYS(x, x + sizeof x / sizeof x[0]);
 
 
-const int LDELTA = 3;
-const int MATCHES = 5;
+const int MATCHES = 1;
 
 const char* RED = "\033[1;31m";
 const char* GRN = "\033[1;32m";
@@ -96,7 +95,7 @@ const char DELIMITER = ' ';
 const std::regex word("[a-zA-Z']+(-[a-zA-Z']+)?");
 
 static std::map<std::string,int> wordcounts;
-static stringlist firstletters[27][27];
+static stringlist firstletters[27][27][50];
 
 struct replacement{
   std::string s;
@@ -118,6 +117,10 @@ float subweight = 2;
 float subscale = 2;
 float insweight = 0.5f;
 float insscale = 2;
+
+int nthreads = 1;
+int ldelta = 2;
+int wcthreshold = 1;
 
 std::string dictfile = "/home/pretzel/workspace/spellcheck/alldicts";
 std::string trainfile = "/home/pretzel/data/gutenberg/allpaths";
@@ -141,18 +144,22 @@ void LoadDict(std::string dpath) {
       // std::cout << itr.key() << ": " << *itr << "\n";
       std::string s = itr.key().asString();
       int sl = s.length()-1;
-      wordcounts[s] = (*itr).asInt();
+      int wc = (*itr).asInt();
+      if (wc < wcthreshold)
+        continue;
+      wordcounts[s] = wc;
+      // std::cout << s << ":" << wordcounts[s] << std::endl;
       if (s[0] != '\'') {
         if (s[sl] != '\'') {
-          firstletters[s[0]-97][s[sl]-97].push_back(s);
+          firstletters[s[0]-97][s[sl]-97][sl].push_back(s);
         } else {
-          firstletters[s[0]-97][26].push_back(s);
+          firstletters[s[0]-97][26][sl].push_back(s);
         }
       } else {
         if (s[sl] != '\'') {
-          firstletters[26][s[sl]-97].push_back(s);
+          firstletters[26][s[sl]-97][sl].push_back(s);
         } else {
-          firstletters[26][26].push_back(s);
+          firstletters[26][26][sl].push_back(s);
         }
       }
     }
@@ -180,6 +187,17 @@ void LoadConfig(std::string dpath) {
       if (s.compare("dictfile") == 0) {
         dictfile = (*itr).asString();
         // std::cout << "Using dictionary " << dictfile << std::endl;
+        continue;
+      }
+      if (s.compare("ldelta") == 0) {
+        ldelta = (*itr).asInt();
+        // std::cout << "Using ldeltas of " << std::to_string(ldelta) << std::endl;
+        continue;
+      }
+      if (s.compare("wcthreshold") == 0) {
+        wcthreshold = (*itr).asInt();
+        // std::cout << "Using wcthreshold of " << std::to_string(wcthreshold) << std::endl;
+        continue;
       }
     }
     input.close();
@@ -450,59 +468,73 @@ std::string FindReplacements(std::string s, std::fstream &fs) {
     reps[i] = {"",99};
 
   //Check for single letter swap
+  std::string bs = "";
+  int bsc = 99;
   for(int i = 1; i < sl; ++i) {
     std::string swap =
       s.substr(0,i-1) + s[i] + s[i-1];
     if (i < sl-1)
       swap = swap + s.substr(i+1,sl-(i+1));
     if (wordcounts.count(swap) > 0) {
-      if (debugcost)
-        std::cout << GRN << "  " << swap << ": SWAP" << BLN << "\n";
-      // fs << swap << "\n";
-      return swap;
+      if (wordcounts[swap] > bsc) {
+        bs = swap;
+        bsc = wordcounts[swap];
+      }
     }
   }
+  if (bs.compare("") != 0) {
+    if (debugcost)
+      std::cout << GRN << "  " << bs << ": SWAP" << BLN << "\n";
+    return bs;
+  }
 
-  std::string right;
-  for (int j = 0; j < 2; ++j) {
-    if (lind[j] == -1)
+  int min = ((sl <= ldelta) ? 0 : sl-ldelta-1);
+  int max = sl+ldelta;
+  #pragma omp parallel for num_threads(nthreads)
+  for (int j = 0; j < 4; ++j) {
+    if (lind[j/2] == -1)
       continue;
-    for (int k = 0; k < 2; ++k) {
-      if (ind[k] == -1)
-        continue;
-      for (stringlist::const_iterator it = firstletters[ind[k]][lind[j]].begin(); it != firstletters[ind[k]][lind[j]].end(); ++it) {
-        right = (*it);
-        int l = right.length()-sl;
-        if (l > LDELTA)
-          continue;
-        // std::cout << "  " << right << ": ";
-        // for (int i = LDELTA-l; i > 0; --i)
-        //   std::cout << " ";
-        l = abs(l);
-        // std::cout << l << ",";
-        int k;
-        int d = LevenI(s,right,false,k);
+    if (ind[j%2] == -1)
+      continue;
+    for (int m = min; m < max; ++m) {
+      for (stringlist::const_iterator it = firstletters[ind[j/2]][lind[j%2]][m].begin(); it != firstletters[ind[j/2]][lind[j%2]][m].end(); ++it) {
+        std::string right = (*it);
+        int l = abs(right.length()-sl);
+        int kd;
+        int d = LevenI(s,right,false,kd);
         // std::cout << k << ",";
         int c = 8-log10(wordcounts[right]);
         if (c < 1)
           c = 1;
         // std::cout << c << ",";
-        int sum = l+d+k+c;
-
+        int sum = l+d+kd+c;
         // std::cout << sum << "\n";
-        if (reps[MATCHES-1].v > sum) {
-          int rank;
-          for (rank = 0; rank < MATCHES; ++rank) {
-            if (reps[rank].v > sum)
-              break;
+        if (MATCHES>1) {
+          if (reps[MATCHES-1].v > sum) {
+            #pragma omp critical
+            {
+              if (reps[MATCHES-1].v > sum) {
+                int rank;
+                for (rank = 0; rank < MATCHES; ++rank) {
+                  if (reps[rank].v > sum)
+                    break;
+                }
+                for (int i = MATCHES-2; i >= rank; --i) {
+                  reps[i+1] = reps[i];
+                }
+                reps[rank] = {right,sum};
+              }
+            }
           }
-          for (int i = MATCHES-2; i >= rank; --i) {
-            reps[i+1] = reps[i];
+        } else {
+          if (reps[0].v >= sum) {
+            #pragma omp critical
+            {
+              if (reps[0].v > sum || (reps[0].v == sum && wordcounts[right] > wordcounts[reps[0].s]))
+                reps[0] = {right,sum};
+            }
           }
-          reps[rank] = {right,sum};
         }
-        // break;
-        // std::cout << right << "\n";
       }
     }
   }
@@ -701,7 +733,7 @@ int ParseArgs(int argc, char** argv) {
   // Shut GetOpt error messages down (return '?'):
   opterr = 0;
   // Retrieve the options:
-  while ( (opt = getopt(argc, argv, ":ci:s:d:t:vx")) != -1 ) {  // for each option...
+  while ( (opt = getopt(argc, argv, ":ci:s:d:t:vxm:")) != -1 ) {  // for each option...
     switch ( opt ) {
       case 'c':
         continuous = true;
@@ -729,6 +761,9 @@ int ParseArgs(int argc, char** argv) {
       case 'x':
         toterminal = true;
         break;
+      case 'm':
+        nthreads = std::atoi(optarg);
+        std::cout << "Using " << std::to_string(nthreads) << " threads" << std::endl;
       case '?':  // unknown option...
         std::cerr << "Unknown option: '" << char(optopt) << "'!" << std::endl;
         break;

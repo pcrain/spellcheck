@@ -1,9 +1,21 @@
 {
+  // "dictfile":"dictionaries/gutendict-small.json",
   "dictfile":"dictionaries/wikidic-en.json",
   "dscale":2,
   "dweight":3,
   "iscale":2,
   "iweight":0.5,
+  "ldelta":3,
   "sscale":2,
-  "sweight":2
+  "sweight":2,
+  "wcthreshold":500
 }
+// 69.97% @ 10
+// 78.98% @ 100
+// 79.23% @ 500
+// 76.94% @ 1000
+
+// 69.97% @ 10
+// 79.48% @ 100
+// 79.48% @ 500
+// 77.18% @ 1000
