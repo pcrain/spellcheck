@@ -26,7 +26,7 @@ corpus=sys.argv[1]
 with open(corpus,"r") as fin:
   inlines=fin.read().split("\n")
 
-with open(corpus+"out","r") as fin:
+with open(corpus+".scout","r") as fin:
   outlines=fin.read().split("\n")
 
 with open(corpus+"ref","r") as fin:

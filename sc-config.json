@@ -10,7 +10,7 @@
   "ldelta":3,
   "sscale":2,
   "sweight":2,
-  "wcthreshold":1
+  "wcthreshold":500
 }
 // 69.97% @ 10
 // 78.98% @ 100

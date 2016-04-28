@@ -21,115 +21,113 @@
    #include <unistd.h>
 #endif
 
-typedef std::map<char,std::list<char> > keymap;
-typedef std::map<std::string,int> countmap;
-typedef std::list<std::string> stringlist;
+//Typedefs
+  typedef std::map<char,std::list<char> > keymap;
+  typedef std::map<std::string,int> countmap;
+  typedef std::list<std::string> stringlist;
 
-static keymap::value_type x[] = {
-  std::make_pair('`', std::list<char>{'1','q'}),
+//Constants
+  const keymap::value_type x[] = {
+    std::make_pair('`', std::list<char>{'1','q'}),
 
-  std::make_pair('1', std::list<char>{'2','w','q'}),
-  std::make_pair('2', std::list<char>{'1','3','e','w','q'}),
-  std::make_pair('3', std::list<char>{'2','4','r','e','w'}),
-  std::make_pair('4', std::list<char>{'3','5','t','r','e'}),
-  std::make_pair('5', std::list<char>{'4','6','y','t','r'}),
-  std::make_pair('6', std::list<char>{'5','7','u','y','t'}),
-  std::make_pair('7', std::list<char>{'6','8','i','u','y'}),
-  std::make_pair('8', std::list<char>{'7','9','o','i','u'}),
-  std::make_pair('9', std::list<char>{'8','0','p','o','i'}),
-  std::make_pair('0', std::list<char>{'9','p','o'}),
-  std::make_pair('-', std::list<char>{'0','p'}),
+    std::make_pair('1', std::list<char>{'2','w','q'}),
+    std::make_pair('2', std::list<char>{'1','3','e','w','q'}),
+    std::make_pair('3', std::list<char>{'2','4','r','e','w'}),
+    std::make_pair('4', std::list<char>{'3','5','t','r','e'}),
+    std::make_pair('5', std::list<char>{'4','6','y','t','r'}),
+    std::make_pair('6', std::list<char>{'5','7','u','y','t'}),
+    std::make_pair('7', std::list<char>{'6','8','i','u','y'}),
+    std::make_pair('8', std::list<char>{'7','9','o','i','u'}),
+    std::make_pair('9', std::list<char>{'8','0','p','o','i'}),
+    std::make_pair('0', std::list<char>{'9','p','o'}),
+    std::make_pair('-', std::list<char>{'0','p'}),
 
-  std::make_pair('q', std::list<char>{'1','2','w','s','a'}),
-  std::make_pair('w', std::list<char>{'1','2','3','e','d','s','a','q'}),
-  std::make_pair('e', std::list<char>{'2','3','4','r','f','d','s','w'}),
-  std::make_pair('r', std::list<char>{'3','4','5','t','g','f','d','e'}),
-  std::make_pair('t', std::list<char>{'4','5','6','y','h','g','f','r'}),
-  std::make_pair('y', std::list<char>{'5','6','7','u','j','h','g','t'}),
-  std::make_pair('u', std::list<char>{'6','7','8','i','k','j','h','y'}),
-  std::make_pair('i', std::list<char>{'7','8','9','o','l','k','j','u'}),
-  std::make_pair('o', std::list<char>{'8','9','0','p','l','k','i'}),
-  std::make_pair('p', std::list<char>{'9','0','l','o'}),
-  std::make_pair('[', std::list<char>{'0','p'}),
+    std::make_pair('q', std::list<char>{'1','2','w','s','a'}),
+    std::make_pair('w', std::list<char>{'1','2','3','e','d','s','a','q'}),
+    std::make_pair('e', std::list<char>{'2','3','4','r','f','d','s','w'}),
+    std::make_pair('r', std::list<char>{'3','4','5','t','g','f','d','e'}),
+    std::make_pair('t', std::list<char>{'4','5','6','y','h','g','f','r'}),
+    std::make_pair('y', std::list<char>{'5','6','7','u','j','h','g','t'}),
+    std::make_pair('u', std::list<char>{'6','7','8','i','k','j','h','y'}),
+    std::make_pair('i', std::list<char>{'7','8','9','o','l','k','j','u'}),
+    std::make_pair('o', std::list<char>{'8','9','0','p','l','k','i'}),
+    std::make_pair('p', std::list<char>{'9','0','l','o'}),
+    std::make_pair('[', std::list<char>{'0','p'}),
 
-  std::make_pair('a', std::list<char>{'q','w','s','x','z'}),
-  std::make_pair('s', std::list<char>{'q','w','e','d','c','x','z','a'}),
-  std::make_pair('d', std::list<char>{'w','e','r','f','v','c','x','s'}),
-  std::make_pair('f', std::list<char>{'e','r','t','g','b','v','c','d'}),
-  std::make_pair('g', std::list<char>{'r','t','y','h','n','b','v','f'}),
-  std::make_pair('h', std::list<char>{'t','y','u','j','m','n','b','g'}),
-  std::make_pair('j', std::list<char>{'y','u','i','k','m','n','h'}),
-  std::make_pair('k', std::list<char>{'u','i','o','l','m','j'}),
-  std::make_pair('l', std::list<char>{'i','o','p','k'}),
-  std::make_pair(';', std::list<char>{'o','p','l'}),
-  std::make_pair('\'', std::list<char>{'p'}),
+    std::make_pair('a', std::list<char>{'q','w','s','x','z'}),
+    std::make_pair('s', std::list<char>{'q','w','e','d','c','x','z','a'}),
+    std::make_pair('d', std::list<char>{'w','e','r','f','v','c','x','s'}),
+    std::make_pair('f', std::list<char>{'e','r','t','g','b','v','c','d'}),
+    std::make_pair('g', std::list<char>{'r','t','y','h','n','b','v','f'}),
+    std::make_pair('h', std::list<char>{'t','y','u','j','m','n','b','g'}),
+    std::make_pair('j', std::list<char>{'y','u','i','k','m','n','h'}),
+    std::make_pair('k', std::list<char>{'u','i','o','l','m','j'}),
+    std::make_pair('l', std::list<char>{'i','o','p','k'}),
+    std::make_pair(';', std::list<char>{'o','p','l'}),
+    std::make_pair('\'', std::list<char>{'p'}),
 
-  std::make_pair('z', std::list<char>{'a','s','x'}),
-  std::make_pair('x', std::list<char>{'a','s','d','c','z'}),
-  std::make_pair('c', std::list<char>{'s','d','f','v','x'}),
-  std::make_pair('v', std::list<char>{'d','f','g','b','c'}),
-  std::make_pair('b', std::list<char>{'f','g','h','n','v'}),
-  std::make_pair('n', std::list<char>{'g','h','j','m','b'}),
-  std::make_pair('m', std::list<char>{'h','j','k','n'}),
-  std::make_pair(',', std::list<char>{'j','k','l','m'}),
-  std::make_pair('.', std::list<char>{'k','l'}),
-  std::make_pair('/', std::list<char>{'l'}),
-};
-static keymap KEYS(x, x + sizeof x / sizeof x[0]);
+    std::make_pair('z', std::list<char>{'a','s','x'}),
+    std::make_pair('x', std::list<char>{'a','s','d','c','z'}),
+    std::make_pair('c', std::list<char>{'s','d','f','v','x'}),
+    std::make_pair('v', std::list<char>{'d','f','g','b','c'}),
+    std::make_pair('b', std::list<char>{'f','g','h','n','v'}),
+    std::make_pair('n', std::list<char>{'g','h','j','m','b'}),
+    std::make_pair('m', std::list<char>{'h','j','k','n'}),
+    std::make_pair(',', std::list<char>{'j','k','l','m'}),
+    std::make_pair('.', std::list<char>{'k','l'}),
+    std::make_pair('/', std::list<char>{'l'}),
+  };
+  keymap KEYS(x, x + sizeof x / sizeof x[0]);
 
+  const int MATCHES = 1;
 
-const int MATCHES = 1;
+  const char* RED = "\033[1;31m";
+  const char* GRN = "\033[1;32m";
+  const char* YLW = "\033[1;33m";
+  const char* BLU = "\033[1;34m";
+  const char* MGN = "\033[1;35m";
+  const char* CYN = "\033[1;36m";
+  const char* WHT = "\033[1;37m";
+  const char* BLN = "\033[0m";
 
-const char* RED = "\033[1;31m";
-const char* GRN = "\033[1;32m";
-const char* YLW = "\033[1;33m";
-const char* BLU = "\033[1;34m";
-const char* MGN = "\033[1;35m";
-const char* CYN = "\033[1;36m";
-const char* WHT = "\033[1;37m";
-const char* BLN = "\033[0m";
+  const std::string OUTFILE = "wikiout";
+  const char DELIMITER = ' ';
 
-const std::string OUTFILE = "wikiout";
-const char DELIMITER = ' ';
-
-const std::regex word("[a-zA-Z']+(-[a-zA-Z']+)?");
-
-static std::map<std::string,int> wordcounts;
-static std::map<std::string,std::string> autocorrect;
-static stringlist firstletters[27][27][50];
-
-struct replacement{
-  std::string s;
-  int v;
-};
-
-static replacement reps[10];
+  const std::regex word("[a-zA-Z']+(-[a-zA-Z']+)?");
 
 //Globals
+  struct replacement{
+    std::string s;
+    int v;
+  };
+  replacement reps[MATCHES];
+  std::map<std::string,int> wordcounts;
+  std::map<std::string,std::string> autocorrect;
+  stringlist firstletters[27][27][50];
 
-bool training = false;
-bool debugcost = false;
-bool toterminal = false;
-bool continuous = false;
-bool acpriority = true;
+  bool training = false;
+  bool debugcost = false;
+  bool toterminal = false;
+  bool continuous = false;
+  bool acpriority = true;
 
-float delweight = 3;
-float delscale = 2;
-float subweight = 2;
-float subscale = 2;
-float insweight = 0.5f;
-float insscale = 2;
+  float delweight = 3;
+  float delscale = 2;
+  float subweight = 2;
+  float subscale = 2;
+  float insweight = 0.5f;
+  float insscale = 2;
 
-int nthreads = 1;
-int ldelta = 2;
-int wcthreshold = 1;
+  int nthreads = 1;
+  int ldelta = 2;
+  int wcthreshold = 1;
 
-std::string dictfile = "/home/pretzel/workspace/spellcheck/alldicts";
-std::string trainfile = "/home/pretzel/data/gutenberg/allpaths";
-std::string acfile = "";
+  std::string dictfile = "/home/pretzel/workspace/spellcheck/alldicts";
+  std::string trainfile = "/home/pretzel/data/gutenberg/allpaths";
+  std::string acfile = "";
 
 bool FileExists(const std::string &Filename ) {
-    return access( Filename.c_str(), 0 ) == 0;
+    return access(Filename.c_str(), 0) == 0;
 }
 
 void LoadAutoCorrect(std::string dpath) {
@@ -490,45 +488,30 @@ int ReadFileList(std::string fname) {
   file.close();
 }
 
-std::string FindReplacements(std::string s, std::fstream &fs) {
-  int sl = s.length();
-  int ind[2], lind[2];
-  for (int i = 0; i < 2; ++i) {
-    if (s[i] == '-')
-      ind[i] = -1;
-    else
-      ind[i] = (s[i] == '\'') ? 26 : (s[i]-97);
-    if (s[sl-i-1] == '-')
-      lind[i] = -1;
-    else
-      lind[i] = (s[sl-i-1] == '\'') ? 26 : (s[sl-i-1]-97);
-  }
-
+std::string FindReplacements(std::string s) {
+  int sl = s.length(), ind[2], lind[2];
   for (int i = 0; i < MATCHES; ++i)
     reps[i] = {"",99};
+  for (int i = 0; i < 2; ++i) {
+    ind[i] = (s[i] == '-') ? -1 : ((s[i] == '\'') ? 26 : (s[i]-97));
+    lind[i] = (s[sl-i-1] == '-') ? -1 : ((s[sl-i-1] == '\'') ? 26 : (s[sl-i-1]-97));
+  }
 
-  //Check for autocorrect
-  if (! acpriority) {
-    if (autocorrect.count(s) > 0) {
-      if (debugcost)
-        std::cout << CYN << "  " << autocorrect[s] << ": AUTO" << BLN << "\n";
-      return autocorrect[s];
-    }
+  //Check for autocorrect now if it didn't have priority before
+  if (!acpriority && (autocorrect.count(s) > 0)) {
+    if (debugcost)
+      std::cout << CYN << "  " << autocorrect[s] << ": AUTO" << BLN << "\n";
+    return autocorrect[s];
   }
 
   //Check for single letter swap
-  std::string bs = "";
+  std::string swap, bs = "";
   int bsc = 99;
   for(int i = 1; i < sl; ++i) {
-    std::string swap =
-      s.substr(0,i-1) + s[i] + s[i-1];
-    if (i < sl-1)
-      swap = swap + s.substr(i+1,sl-(i+1));
-    if (wordcounts.count(swap) > 0) {
-      if (wordcounts[swap] > bsc) {
-        bs = swap;
-        bsc = wordcounts[swap];
-      }
+    swap = s.substr(0,i-1) + s[i] + s[i-1] + ((i < sl-1) ? s.substr(i+1,sl-(i+1)) : "");
+    if (wordcounts.count(swap) > 0 && wordcounts[swap] > bsc) {
+      bs = swap;
+      bsc = wordcounts[swap];
     }
   }
   if (bs.compare("") != 0) {
@@ -541,47 +524,35 @@ std::string FindReplacements(std::string s, std::fstream &fs) {
   int max = sl+ldelta;
   #pragma omp parallel for num_threads(nthreads)
   for (int j = 0; j < 4; ++j) {
-    if (lind[j/2] == -1)
-      continue;
-    if (ind[j%2] == -1)
+    if (lind[j/2] == -1 || ind[j%2] == -1)
       continue;
     for (int m = min; m < max; ++m) {
       for (stringlist::const_iterator it = firstletters[ind[j/2]][lind[j%2]][m].begin(); it != firstletters[ind[j/2]][lind[j%2]][m].end(); ++it) {
         std::string right = (*it);
         int l = abs(right.length()-sl);
-        int kd;
-        int d = LevenI(s,right,false,kd);
-        // std::cout << k << ",";
+        int kd, d = LevenI(s,right,false,kd);
         int c = 8-log10(wordcounts[right]);
-        if (c < 1)
-          c = 1;
-        // std::cout << c << ",";
+        if (c < 1) c = 1;
         int sum = l+d+kd+c;
-        // std::cout << sum << "\n";
         if (MATCHES>1) {
-          if (reps[MATCHES-1].v > sum) {
-            #pragma omp critical
-            {
-              if (reps[MATCHES-1].v > sum) {
-                int rank;
-                for (rank = 0; rank < MATCHES; ++rank) {
-                  if (reps[rank].v > sum)
-                    break;
-                }
-                for (int i = MATCHES-2; i >= rank; --i) {
-                  reps[i+1] = reps[i];
-                }
-                reps[rank] = {right,sum};
-              }
+          if (reps[MATCHES-1].v <= sum)
+            continue;
+          #pragma omp critical
+          {
+            if (reps[MATCHES-1].v > sum) {  //Redundant thread-safe check
+              int rank;
+              for (rank = 0; reps[rank].v <= sum; ++rank);
+              for (int i = MATCHES-2; i >= rank; reps[i+1] = reps[i],--i);
+              reps[rank] = {right,sum};
             }
           }
         } else {
-          if (reps[0].v >= sum) {
-            #pragma omp critical
-            {
-              if (reps[0].v > sum || (reps[0].v == sum && wordcounts[right] > wordcounts[reps[0].s]))
-                reps[0] = {right,sum};
-            }
+          if (reps[0].v < sum)
+            continue;
+          #pragma omp critical
+          {
+            if (reps[0].v > sum || (reps[0].v == sum && wordcounts[right] > wordcounts[reps[0].s]))
+              reps[0] = {right,sum};
           }
         }
       }
@@ -597,205 +568,104 @@ std::string FindReplacements(std::string s, std::fstream &fs) {
 }
 
 void CheckFile(std::string fname) {
-
-  std::fstream fs;
-  remove(std::string(fname+".scout").c_str());
-  fs.open (fname+".scout", std::fstream::out | std::fstream::app);
-
   std::ifstream infile(fname);
+  std::fstream fs;
   std::string str;
+  fs.open (fname+".scout", std::fstream::out);
   while (std::getline(infile, str)) {
     std::smatch m;
-    size_t start = str.find_first_not_of(DELIMITER), end=start;
-    if (start > 0 && start < 100) {
-      for (int i = 0; i < start; ++ i) {
+    size_t end = str.find_first_not_of(DELIMITER);
+    if (end < 100) {
+      for (int i = 0; i < end; ++i) {
         if (toterminal)
           std::cout << DELIMITER;
         fs << DELIMITER;
       }
     }
-    std::string s;
-    bool first = true;
-    while (start != std::string::npos){
-        std::string startpunc = "", endpunc = "";
-        bool haspunc = false;
-        end = str.find(DELIMITER, start);
-        s = str.substr(start, end-start);
-        int sl = s.length();
-        // std::cout << s << std::endl;
-        if((s[0] == '\'' && s[sl-1] == '\'') || !std::regex_match(s,word)) {
-          //Strip punctuations
-          for (int i = 0; i < sl; ++i) {
-            if ( (s[i] > 64 && s[i] < 91) || (s[i] > 96 && s[i] < 123) ) {
-              startpunc = s.substr(0,i);
-              s = s.substr(i,sl-i);
-              break;
-            }
-          }
-          sl = s.length();
-          for (int i = sl-1; i > 0; --i) {
-            if ( (s[i] > 64 && s[i] < 91) || (s[i] > 96 && s[i] < 123) ) {
-              endpunc = s.substr(i+1,sl-i);
-              s = s.substr(0,i+1);
-              break;
-            }
-          }
-          // std::cout << startpunc << MGN << s << BLN << endpunc << std::endl;
-
-          if(!std::regex_match(s,word)) {
-            // std::cout << YLW << s << BLN << " cannot be checked\n";
-            if (first) {
-              if (toterminal)
-                std::cout << startpunc << s << endpunc;
-              fs << startpunc << s << endpunc;
-              first = false;
-            }
-            else {
-              if (toterminal)
-                std::cout << DELIMITER << startpunc << s << endpunc;
-              fs << DELIMITER << startpunc << s << endpunc;
-            }
-            start = str.find_first_not_of(DELIMITER, end);
-            continue;
-          }
-          haspunc = true;
-        }
-        bool caps = false;
-        if (s[0] > 64 && s[0] < 91) {
-          if (s[sl-1] > 64 && s[sl-1] < 91) {
-            // std::cout << CYN << s << BLN << " is an acronym\n";
-            if (first) {
-              if (toterminal)
-                std::cout << s;
-              fs << s;
-              first = false;
-            }
-            else {
-              if (toterminal)
-                std::cout << DELIMITER << s;
-              fs << DELIMITER << s;
-            }
-            if (haspunc) {
-              if (toterminal)
-                std::cout << endpunc;
-              fs << endpunc;
-            }
-            start = str.find_first_not_of(DELIMITER, end);
-            continue;
-          }
-          caps = true;
-          std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-        }
-        if (acpriority && autocorrect.count(s) > 0) {
-          if (debugcost)
-            std::cout << CYN << s << " -> " << autocorrect[s] << ": AUTO" << BLN << "\n";
-            if (first) {
-              if (toterminal)
-                std::cout << startpunc << RED << s << CYN << autocorrect[s] << BLN << endpunc;
-              fs << startpunc << autocorrect[s] << endpunc;
-              first = false;
-            }
-            else {
-              if (toterminal)
-                std::cout << DELIMITER << startpunc << RED << s << CYN << autocorrect[s] << BLN << endpunc;
-              fs << DELIMITER << startpunc << autocorrect[s] << endpunc;
-            }
-            start = str.find_first_not_of(DELIMITER, end);
-            continue;
-        }
-        if (wordcounts.count(s) == 0) {
-          if (s.length() < 2) {
-            //1 letter word
-            if (first) {
-              if (toterminal)
-                std::cout << startpunc << s << endpunc;
-              fs << startpunc << s << endpunc;
-              first = false;
-            }
-            else {
-              if (toterminal)
-                std::cout << DELIMITER << startpunc << s << endpunc;
-              fs << DELIMITER << startpunc << s << endpunc;
-            }
-            start = str.find_first_not_of(DELIMITER, end);
-            continue;
-          }
-          if (debugcost)
-            std::cout <<
-              str.substr(0,start) <<
-              RED <<
-              str.substr(start, end-start) <<
-              BLN <<
-              ((str.length() >= end) ? str.substr(end,str.length()-end) : "") <<
-              std::endl;
-          // std::cout << RED << m[0] << BLN << " is not a word\n";
-          std::string best = FindReplacements(s,fs);
-          if (caps && s[0] != '\'')
-            best[0] -= 32;  //To uppercase
-          if (first) {
-            if (haspunc) {
-              if (toterminal)
-                std::cout << startpunc;
-              fs << startpunc;
-            }
-            if (toterminal)
-              std::cout << RED << str.substr(start, end-start) << GRN << best << BLN;
-            fs << best;
-            first = false;
-          }
-          else {
-            if (toterminal)
-              std::cout << DELIMITER;
-            fs << DELIMITER;
-            if (haspunc) {
-              if (toterminal)
-                std::cout << startpunc;
-              fs << startpunc;
-            }
-            if (toterminal)
-              std::cout << RED << str.substr(start, end-start) << GRN << best << BLN;
-            fs << best;
-          }
-        } else {
-          // std::cout << m[0] <<" is a word\n";
-          if (caps && s[0] != '\'')
-            s[0] -= 32;  //To uppercase
-          if (first) {
-            if (haspunc) {
-              if (toterminal)
-                std::cout << startpunc;
-              fs << startpunc;
-            }
-            if (toterminal)
-              std::cout << s;
-            fs << s;
-            first = false;
-          }
-          else {
-            if (toterminal)
-              std::cout << DELIMITER;
-            fs << DELIMITER;
-            if (haspunc) {
-              if (toterminal)
-                std::cout << startpunc;
-              fs << startpunc;
-            }
-            if (toterminal)
-              std::cout << s;
-            fs << s;
+    std::string s, os, delim = "";
+    for (size_t start = end; start != std::string::npos; start = str.find_first_not_of(DELIMITER, end)){
+      std::string startpunc = "", endpunc = "";
+      end = str.find(DELIMITER, start);
+      os = str.substr(start, end-start);
+      s = os;
+      int sl = s.length();
+      //Strip punctuation
+      if((s[0] == '\'' && s[sl-1] == '\'') || !std::regex_match(s,word)) {
+        for (int i = 0; i < sl; ++i) { //Strip punctuations
+          if ( (s[i] > 64 && s[i] < 91) || (s[i] > 96 && s[i] < 123) ) {
+            startpunc = s.substr(0,i);
+            s = s.substr(i,sl-i);
+            sl -= i;
+            break;
           }
         }
-        if (haspunc) {
+        for (int i = sl-1; i > 0; --i) {
+          if ( (s[i] > 64 && s[i] < 91) || (s[i] > 96 && s[i] < 123) ) {
+            endpunc = s.substr(i+1,sl-i);
+            s = s.substr(0,i+1);
+            sl = i+1;
+            break;
+          }
+        }
+        if(!std::regex_match(s,word)) {
+          // std::cout << YLW << s << BLN << " cannot be checked\n";
           if (toterminal)
-            std::cout << endpunc;
-          fs << endpunc;
+            std::cout << delim << startpunc << s << endpunc;
+          fs << delim << startpunc << s << endpunc;
+          continue;
         }
-        // std::cout << MGN << s << BLN << std::endl;
-        start = str.find_first_not_of(DELIMITER, end);
+      }
+      //Check capitalization
+      bool caps = (s[0] > 64 && s[0] < 91);
+      if (caps && s[sl-1] > 64 && s[sl-1] < 91) {
+        // std::cout << CYN << s << BLN << " is an acronym\n";
+        if (toterminal)
+          std::cout << delim << s << endpunc;
+        fs << delim << s << endpunc;
+        continue;
+      }
+      //Convert to lowercase
+      for (int i = 0; i < sl; ++i) {
+        if (s[i] > 64 && s[i] < 91)
+          s[i] += 32;
+      }
+      //Autocorrect if possible and if it has priority
+      if (acpriority && autocorrect.count(s) > 0) {
+        if (debugcost)
+          std::cout << CYN << s << " -> " << autocorrect[s] << ": AUTO" << BLN << "\n";
+        if (toterminal)
+          std::cout << delim << startpunc << RED << s << CYN << autocorrect[s] << BLN << endpunc;
+        fs << delim << startpunc << autocorrect[s] << endpunc;
+        continue;
+      }
+      if (wordcounts.count(s) == 0) {
+        if (s.length() < 3) { //1-2 letter word
+          if (toterminal)
+            std::cout << delim << startpunc << s << endpunc;
+          fs << delim << startpunc << s << endpunc;
+          continue;
+        }
+        // std::cout << RED << s << BLN << " is not a word\n";
+        if (debugcost)
+          std::cout << str.substr(0,start) << RED << os << BLN <<
+          ((str.length() >= end) ? str.substr(end,str.length()-end) : "") << std::endl;
+        std::string best = FindReplacements(s);
+        if (caps && s[0] != '\'')
+          best[0] -= 32;  //To uppercase
+        if (toterminal)
+          std::cout << delim << startpunc << RED << os << GRN << best << BLN << endpunc;
+        fs << delim << startpunc << best << endpunc;
+      } else {
+        // std::cout << s <<" is a word\n";
+        if (toterminal)
+          std::cout << delim << os;
+        fs << delim << os;
+      }
+      delim = DELIMITER;
     }
     if (toterminal)
       std::cout << "\n";
-     fs << "\n";
+    fs << "\n";
   }
   infile.close();
   fs.close();
