@@ -1,0 +1,9 @@
+{
+  "dictfile":"dictionaries/wikidic-en.json",
+  "dscale":2,
+  "dweight":3,
+  "iscale":2,
+  "iweight":0.5,
+  "sscale":2,
+  "sweight":2
+}

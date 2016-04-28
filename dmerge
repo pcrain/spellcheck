@@ -1,0 +1,28 @@
+#!/usr/bin/python
+#Merges temp dictionaries into one big dictionary
+
+import os
+import json
+
+OUTFILE="alldicts"
+
+alljson={}
+files=os.listdir(os.getcwd()+"/_temp-dictionaries")
+mx=len(files)
+for fname in files:
+  with open("./_temp-dictionaries/"+fname,"r") as f:
+    print(str(mx)+" "*(6-len(str(mx)))+fname)
+    j = json.loads(f.read());
+    for k,v in j.items():
+      # print(k)
+      if k in alljson:
+        alljson[k] += v
+      else:
+        alljson[k] = v
+  mx -= 1
+  if mx == 0:
+    break
+
+with open("./alldicts","w") as f:
+  # print(alljson)
+  json.dump(alljson,f,indent=2, sort_keys=True)
