@@ -599,14 +599,21 @@ std::string FindReplacements(std::string s, std::fstream &fs) {
 void CheckFile(std::string fname) {
 
   std::fstream fs;
-  remove(std::string(fname+"out").c_str());
-  fs.open (fname+"out", std::fstream::out | std::fstream::app);
+  remove(std::string(fname+".scout").c_str());
+  fs.open (fname+".scout", std::fstream::out | std::fstream::app);
 
   std::ifstream infile(fname);
   std::string str;
   while (std::getline(infile, str)) {
     std::smatch m;
     size_t start = str.find_first_not_of(DELIMITER), end=start;
+    if (start > 0 && start < 100) {
+      for (int i = 0; i < start; ++ i) {
+        if (toterminal)
+          std::cout << DELIMITER;
+        fs << DELIMITER;
+      }
+    }
     std::string s;
     bool first = true;
     while (start != std::string::npos){
