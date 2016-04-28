@@ -524,7 +524,7 @@ std::string FindReplacements(std::string s) {
   int max = sl+ldelta;
   #pragma omp parallel for num_threads(nthreads)
   for (int j = 0; j < 4; ++j) {
-    if (lind[j/2] == -1 || ind[j%2] == -1)
+    if (lind[j%2] == -1 || ind[j/2] == -1)
       continue;
     for (int m = min; m < max; ++m) {
       for (stringlist::const_iterator it = firstletters[ind[j/2]][lind[j%2]][m].begin(); it != firstletters[ind[j/2]][lind[j%2]][m].end(); ++it) {
