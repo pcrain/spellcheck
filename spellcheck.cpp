@@ -27,57 +27,62 @@
   typedef std::list<std::string> stringlist;
 
 //Constants
-  const keymap::value_type x[] = {
-    std::make_pair('`', std::list<char>{'1','q'}),
-
-    std::make_pair('1', std::list<char>{'2','w','q'}),
-    std::make_pair('2', std::list<char>{'1','3','e','w','q'}),
-    std::make_pair('3', std::list<char>{'2','4','r','e','w'}),
-    std::make_pair('4', std::list<char>{'3','5','t','r','e'}),
-    std::make_pair('5', std::list<char>{'4','6','y','t','r'}),
-    std::make_pair('6', std::list<char>{'5','7','u','y','t'}),
-    std::make_pair('7', std::list<char>{'6','8','i','u','y'}),
-    std::make_pair('8', std::list<char>{'7','9','o','i','u'}),
-    std::make_pair('9', std::list<char>{'8','0','p','o','i'}),
-    std::make_pair('0', std::list<char>{'9','p','o'}),
-    std::make_pair('-', std::list<char>{'0','p'}),
-
-    std::make_pair('q', std::list<char>{'1','2','w','s','a'}),
-    std::make_pair('w', std::list<char>{'1','2','3','e','d','s','a','q'}),
-    std::make_pair('e', std::list<char>{'2','3','4','r','f','d','s','w'}),
-    std::make_pair('r', std::list<char>{'3','4','5','t','g','f','d','e'}),
-    std::make_pair('t', std::list<char>{'4','5','6','y','h','g','f','r'}),
-    std::make_pair('y', std::list<char>{'5','6','7','u','j','h','g','t'}),
-    std::make_pair('u', std::list<char>{'6','7','8','i','k','j','h','y'}),
-    std::make_pair('i', std::list<char>{'7','8','9','o','l','k','j','u'}),
-    std::make_pair('o', std::list<char>{'8','9','0','p','l','k','i'}),
-    std::make_pair('p', std::list<char>{'9','0','l','o'}),
-    std::make_pair('[', std::list<char>{'0','p'}),
-
-    std::make_pair('a', std::list<char>{'q','w','s','x','z'}),
-    std::make_pair('s', std::list<char>{'q','w','e','d','c','x','z','a'}),
-    std::make_pair('d', std::list<char>{'w','e','r','f','v','c','x','s'}),
-    std::make_pair('f', std::list<char>{'e','r','t','g','b','v','c','d'}),
-    std::make_pair('g', std::list<char>{'r','t','y','h','n','b','v','f'}),
-    std::make_pair('h', std::list<char>{'t','y','u','j','m','n','b','g'}),
-    std::make_pair('j', std::list<char>{'y','u','i','k','m','n','h'}),
-    std::make_pair('k', std::list<char>{'u','i','o','l','m','j'}),
-    std::make_pair('l', std::list<char>{'i','o','p','k'}),
-    std::make_pair(';', std::list<char>{'o','p','l'}),
-    std::make_pair('\'', std::list<char>{'p'}),
-
-    std::make_pair('z', std::list<char>{'a','s','x'}),
-    std::make_pair('x', std::list<char>{'a','s','d','c','z'}),
-    std::make_pair('c', std::list<char>{'s','d','f','v','x'}),
-    std::make_pair('v', std::list<char>{'d','f','g','b','c'}),
-    std::make_pair('b', std::list<char>{'f','g','h','n','v'}),
-    std::make_pair('n', std::list<char>{'g','h','j','m','b'}),
-    std::make_pair('m', std::list<char>{'h','j','k','n'}),
-    std::make_pair(',', std::list<char>{'j','k','l','m'}),
-    std::make_pair('.', std::list<char>{'k','l'}),
-    std::make_pair('/', std::list<char>{'l'}),
+  const std::list<char> NL{};  //Null List
+  const std::list<char> KEYS[] = {  //Length == 79
+    std::list<char>{'j','k','l','m'}, //44
+    std::list<char>{'0','p'},
+    std::list<char>{'k','l'},
+    std::list<char>{'l'},
+    std::list<char>{'9','p','o'},
+    std::list<char>{'2','w','q'},  //49
+    std::list<char>{'1','3','e','w','q'},
+    std::list<char>{'2','4','r','e','w'},
+    std::list<char>{'3','5','t','r','e'},
+    std::list<char>{'4','6','y','t','r'},
+    std::list<char>{'5','7','u','y','t'},
+    std::list<char>{'6','8','i','u','y'},
+    std::list<char>{'7','9','o','i','u'},
+    std::list<char>{'8','0','p','o','i'}, //57
+    NL,
+    std::list<char>{'o','p','l'},
+    NL,NL,NL,NL,NL,
+    NL,NL,NL,NL,NL, //69
+    NL,NL,NL,NL,NL,
+    NL,NL,NL,NL,NL, //79
+    NL,NL,NL,NL,NL,
+    NL,NL,NL,NL,NL, //89
+    NL, //90
+    std::list<char>{'0','p'},
+    std::list<char>{'p'},
+    NL,NL,NL,
+    std::list<char>{'1','q'}, //96
+    std::list<char>{'q','w','s','x','z'},
+    std::list<char>{'f','g','h','n','v'},
+    std::list<char>{'s','d','f','v','x'},
+    std::list<char>{'w','e','r','f','v','c','x','s'},
+    std::list<char>{'2','3','4','r','f','d','s','w'},
+    std::list<char>{'e','r','t','g','b','v','c','d'},
+    std::list<char>{'r','t','y','h','n','b','v','f'},
+    std::list<char>{'t','y','u','j','m','n','b','g'},
+    std::list<char>{'7','8','9','o','l','k','j','u'},
+    std::list<char>{'y','u','i','k','m','n','h'},
+    std::list<char>{'u','i','o','l','m','j'},
+    std::list<char>{'i','o','p','k'},
+    std::list<char>{'h','j','k','n'},
+    std::list<char>{'g','h','j','m','b'},
+    std::list<char>{'8','9','0','p','l','k','i'},
+    std::list<char>{'9','0','l','o'},
+    std::list<char>{'1','2','w','s','a'},
+    std::list<char>{'3','4','5','t','g','f','d','e'},
+    std::list<char>{'q','w','e','d','c','x','z','a'},
+    std::list<char>{'4','5','6','y','h','g','f','r'},
+    std::list<char>{'6','7','8','i','k','j','h','y'},
+    std::list<char>{'d','f','g','b','c'},
+    std::list<char>{'1','2','3','e','d','s','a','q'},
+    std::list<char>{'a','s','d','c','z'},
+    std::list<char>{'5','6','7','u','j','h','g','t'},
+    std::list<char>{'a','s','x'},
   };
-  keymap KEYS(x, x + sizeof x / sizeof x[0]);
 
   const int MATCHES = 1;
   const int VMAX = 99;
@@ -263,9 +268,9 @@ int LevenPrint(std::string s, std::string t, int** d, bool keydist) {
       i -= 1; j -= 1;
       if (d[i][j] < c) {  //Substitute
         if (keydist) {
-          char ikey = temp[i];
+          int ikey = temp[i]-44;
           // std::cout << ikey << " -> " << jkey;
-          if (KEYS.find(ikey) != KEYS.end()) {
+          if (ikey > 0 && ikey < 79) {
             if (std::find(KEYS[ikey].begin(),KEYS[ikey].end(),t[j]) != KEYS[ikey].end()) {
               weight += 1;
               // std::cout << GRN << "Neighbors" << BLN;
