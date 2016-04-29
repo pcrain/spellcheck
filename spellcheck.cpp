@@ -80,7 +80,9 @@
   keymap KEYS(x, x + sizeof x / sizeof x[0]);
 
   const int MATCHES = 1;
+  const int VMAX = 99;
 
+  const char* BLK = "\033[1;30m";
   const char* RED = "\033[1;31m";
   const char* GRN = "\033[1;32m";
   const char* YLW = "\033[1;33m";
@@ -491,7 +493,7 @@ int ReadFileList(std::string fname) {
 std::string FindReplacements(std::string s) {
   int sl = s.length(), ind[2], lind[2];
   for (int i = 0; i < MATCHES; ++i)
-    reps[i] = {"",99};
+    reps[i] = {"",VMAX};
   for (int i = 0; i < 2; ++i) {
     ind[i] = (s[i] == '-') ? -1 : ((s[i] == '\'') ? 26 : (s[i]-97));
     lind[i] = (s[sl-i-1] == '-') ? -1 : ((s[sl-i-1] == '\'') ? 26 : (s[sl-i-1]-97));
@@ -506,7 +508,7 @@ std::string FindReplacements(std::string s) {
 
   //Check for single letter swap
   std::string swap, bs = "";
-  int bsc = 99;
+  int bsc = VMAX;
   for(int i = 1; i < sl; ++i) {
     swap = s.substr(0,i-1) + s[i] + s[i-1] + ((i < sl-1) ? s.substr(i+1,sl-(i+1)) : "");
     if (wordcounts.count(swap) > 0 && wordcounts[swap] > bsc) {
@@ -558,6 +560,11 @@ std::string FindReplacements(std::string s) {
       }
     }
   }
+  if (reps[0].v == VMAX) {
+    if (debugcost)
+      std::cout << RED << "  No replacements found for" << s << BLN << "\n";
+    return s;
+  }
   if (debugcost) {
     std::cout << GRN << "  " << reps[0].s << ": " << reps[0].v << BLN << "\n";
     for (int i = 1; i < MATCHES; ++i) {
@@ -583,14 +590,24 @@ void CheckFile(std::string fname) {
       }
     }
     std::string s, os, delim = "";
+    bool first = true;
     for (size_t start = end; start != std::string::npos; start = str.find_first_not_of(DELIMITER, end)){
+      if (first)
+        first = false;
+      else
+        delim = DELIMITER;
       std::string startpunc = "", endpunc = "";
+      for (int i = end+1; i < start; ++i) {
+        if (toterminal)
+          std::cout << DELIMITER;
+        fs << DELIMITER;
+      }
       end = str.find(DELIMITER, start);
       os = str.substr(start, end-start);
       s = os;
       int sl = s.length();
       //Strip punctuation
-      if((s[0] == '\'' && s[sl-1] == '\'') || !std::regex_match(s,word)) {
+      if((s[0] == '\'' || s[sl-1] == '\'') || !std::regex_match(s,word)) {
         for (int i = 0; i < sl; ++i) { //Strip punctuations
           if ( (s[i] > 64 && s[i] < 91) || (s[i] > 96 && s[i] < 123) ) {
             startpunc = s.substr(0,i);
@@ -645,6 +662,21 @@ void CheckFile(std::string fname) {
           fs << delim << startpunc << s << endpunc;
           continue;
         }
+        //Check for hyphens
+        bool hyphenated = false;
+        for (int i = 0; i < sl; ++i) {
+          if (s[i] == '-') {
+            if (wordcounts.count(s.substr(0,i)) == 1 && wordcounts.count(s.substr(i+1,sl-i-1)) == 1) {
+              if (toterminal)
+                std::cout << delim << startpunc << s << endpunc;
+              fs << delim << startpunc << s << endpunc;
+              hyphenated = true;
+            }
+            break;
+          }
+        }
+        if (hyphenated)
+          continue;
         // std::cout << RED << s << BLN << " is not a word\n";
         if (debugcost)
           std::cout << str.substr(0,start) << RED << os << BLN <<
@@ -653,7 +685,7 @@ void CheckFile(std::string fname) {
         if (caps && s[0] != '\'')
           best[0] -= 32;  //To uppercase
         if (toterminal)
-          std::cout << delim << startpunc << RED << os << GRN << best << BLN << endpunc;
+          std::cout << delim << startpunc << RED << os << ((best.compare(s) == 0) ? BLK : GRN) << best << BLN << endpunc;
         fs << delim << startpunc << best << endpunc;
       } else {
         // std::cout << s <<" is a word\n";
@@ -661,7 +693,6 @@ void CheckFile(std::string fname) {
           std::cout << delim << os;
         fs << delim << os;
       }
-      delim = DELIMITER;
     }
     if (toterminal)
       std::cout << "\n";
